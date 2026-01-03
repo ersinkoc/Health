@@ -280,7 +280,8 @@ export class Router {
 
     // Add base path if not already present
     if (this.basePath !== '/' && !normalized.startsWith(this.basePath)) {
-      normalized = this.basePath + normalized.replace(/^\//, '');
+      const separator = this.basePath.endsWith('/') ? '' : '/';
+      normalized = this.basePath + separator + normalized.replace(/^\//, '');
     }
 
     // Remove trailing slashes (except for root)

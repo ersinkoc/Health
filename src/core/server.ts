@@ -384,12 +384,17 @@ export class HealthServerImpl implements HealthServer {
 
     try {
       const result = await this.runner.run(name, config);
-      this.checkResults.set(name, result.result);
+      // Include critical flag from config in the result
+      this.checkResults.set(name, {
+        ...result.result,
+        critical: config.critical,
+      });
     } catch (error) {
       this.checkResults.set(name, {
         status: 'unhealthy',
         error: (error as Error).message,
         latency: nowMilliseconds() - startTime,
+        critical: config.critical,
       });
     }
   }
