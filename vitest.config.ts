@@ -16,17 +16,15 @@ export default defineConfig({
         '*.config.*',
         '**/*.d.ts',
         '**/dist/**',
-        'src/utils/**/*.ts',
-        'src/plugins/**/*.ts',
-        'src/cli.ts',
-        'src/index.ts',
-        'src/types.ts',
+        'src/index.ts',           // Barrel file - just re-exports
+        'src/types.ts',           // Type definitions only
+        'src/plugins/index.ts',   // Plugin barrel file
       ],
       thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
+        lines: 100,
+        functions: 100,
+        branches: 100,
+        statements: 100,
       },
     },
     testTimeout: 10000,
