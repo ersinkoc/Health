@@ -1,0 +1,48 @@
+{
+  "dashboard": {
+    "title": "Health Check Dashboard",
+    "tags": ["health", "prometheus"],
+    "panels": [
+      {
+        "title": "Health Score",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "health_score",
+            "legendFormat": "Score"
+          }
+        ]
+      },
+      {
+        "title": "Check Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "health_check_status",
+            "legendFormat": "{{name}}"
+          }
+        ]
+      },
+      {
+        "title": "Check Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "health_check_latency_ms",
+            "legendFormat": "{{name}}"
+          }
+        ]
+      },
+      {
+        "title": "Uptime",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "health_uptime_seconds",
+            "legendFormat": "Uptime"
+          }
+        ]
+      }
+    ]
+  }
+}

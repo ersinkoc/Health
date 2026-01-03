@@ -1,0 +1,86 @@
+# @oxog/health
+
+> Zero-dependency health check server with Kubernetes-compatible probes and metrics exposure
+
+## Install
+
+```bash
+npm install @oxog/health
+```
+
+## Basic Usage
+
+```typescript
+import { health } from '@oxog/health';
+
+const server = await health.serve({
+  port: 9000,
+  checks: {
+    database: () => db.ping(),
+    redis: () => redis.ping()
+  }
+});
+```
+
+## API Summary
+
+### Main Export
+
+- `health.serve(options)` - Start health server
+- `health.check(checks)` - One-shot health check
+- `health.checkRemote(url)` - Check remote endpoint
+- `health.create()` - Create custom kernel
+
+### Server Methods
+
+- `server.register(name, check)` - Add check
+- `server.unregister(name)` - Remove check
+- `server.list()` - List checks
+- `server.status()` - Get current status
+- `server.close()` - Graceful shutdown
+
+### Endpoints
+
+- `GET /health` - Full health status
+- `GET /ready` - Kubernetes readiness
+- `GET /live` - Kubernetes liveness
+- `GET /metrics` - Prometheus metrics
+
+## Common Patterns
+
+### Database + Redis Check
+
+```typescript
+health.serve({
+  port: 9000,
+  checks: {
+    database: { handler: () => db.ping(), critical: true },
+    redis: { handler: () => redis.ping(), critical: false }
+  }
+});
+```
+
+### Graceful Degradation
+
+```typescript
+health.serve({
+  checks: {
+    db: { handler: fn, critical: true, weight: 60 },
+    cache: { handler: fn, critical: false, weight: 40 }
+  },
+  thresholds: { healthy: 80, degraded: 50 }
+});
+```
+
+### CLI Usage
+
+```bash
+npx @oxog/health serve --port 9000
+npx @oxog/health check http://localhost:9000/health
+```
+
+## Links
+
+- Docs: https://health.oxog.dev
+- GitHub: https://github.com/ersinkoc/health
+- NPM: https://npmjs.com/package/@oxog/health
