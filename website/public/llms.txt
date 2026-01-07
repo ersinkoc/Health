@@ -46,6 +46,19 @@ const server = await health.serve({
 - `GET /live` - Kubernetes liveness
 - `GET /metrics` - Prometheus metrics
 
+### Core Plugins
+
+- `http` - HTTP server
+- `runner` - Check executor
+- `aggregator` - Status aggregator
+
+### Optional Plugins
+
+- `metrics` - Prometheus + JSON metrics
+- `cli` - Command line interface
+- `thresholds` - Custom thresholds
+- `history` - Check history
+
 ## Common Patterns
 
 ### Database + Redis Check
@@ -78,6 +91,72 @@ health.serve({
 npx @oxog/health serve --port 9000
 npx @oxog/health check http://localhost:9000/health
 ```
+
+## Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `port` | number | 9000 | HTTP port |
+| `host` | string | '0.0.0.0' | Bind host |
+| `basePath` | string | '/' | Base path for endpoints |
+| `timeout` | number | 5000 | Check timeout in ms |
+| `retries` | number | 2 | Retry attempts |
+| `interval` | string/number | '30s' | Check interval |
+| `checks` | object | {} | Health check definitions |
+| `thresholds` | object | {healthy:80, degraded:50} | Score thresholds |
+
+## Check Configuration
+
+```typescript
+{
+  handler: () => Promise<CheckResult>,
+  timeout?: number,        // Override global timeout
+  retries?: number,        // Override global retries
+  critical?: boolean,      // Failure marks service unhealthy
+  weight?: number,         // Health score weight (0-100)
+  interval?: string/number // Check interval override
+}
+```
+
+## Check Result
+
+```typescript
+{
+  status: 'healthy' | 'unhealthy' | 'degraded',
+  latency?: number,
+  metadata?: Record<string, unknown>,
+  error?: string
+}
+```
+
+## Health Status Response
+
+```typescript
+{
+  status: 'healthy' | 'degraded' | 'unhealthy',
+  score: number,           // 0-100
+  uptime: number,          // seconds
+  timestamp: string,       // ISO date
+  checks: {
+    [name]: {
+      status: string,
+      latency: number,
+      lastCheck: string,
+      error?: string,
+      metadata?: Record<string, unknown>
+    }
+  }
+}
+```
+
+## Errors
+
+| Code | Meaning | Solution |
+|------|---------|----------|
+| `CHECK_TIMEOUT` | Check exceeded timeout | Increase timeout or fix slow check |
+| `CHECK_FAILED` | Check threw error | Check handler implementation |
+| `SERVER_ERROR` | HTTP server error | Check port availability |
+| `INVALID_CONFIG` | Invalid configuration | Review config options |
 
 ## Links
 
