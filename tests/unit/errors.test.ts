@@ -188,3 +188,140 @@ describe('Error codes', () => {
     expect(ERROR_CODES.NETWORK_ERROR).toBe('NETWORK_ERROR');
   });
 });
+
+// Import factory functions and type guards
+import {
+  checkTimeout,
+  checkFailed,
+  serverError,
+  invalidConfig,
+  pluginError,
+  missingDependency,
+  routeNotFound,
+  invalidInterval,
+  invalidArgument,
+  pluginAlreadyRegistered,
+  connectionRefused,
+  networkError,
+  isHealthError,
+  isCheckTimeoutError,
+  isCheckFailedError,
+  isServerError,
+  isNetworkError,
+} from '../../src/errors.js';
+
+describe('Error Factory Functions', () => {
+  it('checkTimeout should create CheckTimeoutError', () => {
+    const error = checkTimeout('db', 3000);
+    expect(error).toBeInstanceOf(CheckTimeoutError);
+    expect(error.checkName).toBe('db');
+    expect(error.timeout).toBe(3000);
+  });
+
+  it('checkFailed should create CheckFailedError', () => {
+    const cause = new Error('Failed');
+    const error = checkFailed('redis', cause);
+    expect(error).toBeInstanceOf(CheckFailedError);
+    expect(error.checkName).toBe('redis');
+    expect(error.cause).toBe(cause);
+  });
+
+  it('serverError should create ServerError', () => {
+    const error = serverError('Port in use', { port: 3000 });
+    expect(error).toBeInstanceOf(ServerError);
+    expect(error.message).toBe('Port in use');
+    expect(error.details).toEqual({ port: 3000 });
+  });
+
+  it('invalidConfig should create InvalidConfigError', () => {
+    const error = invalidConfig('Bad config', { field: 'port' });
+    expect(error).toBeInstanceOf(InvalidConfigError);
+    expect(error.message).toBe('Bad config');
+  });
+
+  it('pluginError should create PluginError', () => {
+    const cause = new Error('Init failed');
+    const error = pluginError('metrics', cause);
+    expect(error).toBeInstanceOf(PluginError);
+    expect(error.pluginName).toBe('metrics');
+  });
+
+  it('missingDependency should create MissingDependencyError', () => {
+    const error = missingDependency('http', 'metrics');
+    expect(error).toBeInstanceOf(MissingDependencyError);
+    expect(error.dependency).toBe('http');
+    expect(error.plugin).toBe('metrics');
+  });
+
+  it('routeNotFound should create RouteNotFoundError', () => {
+    const error = routeNotFound('POST', '/api');
+    expect(error).toBeInstanceOf(RouteNotFoundError);
+    expect(error.method).toBe('POST');
+    expect(error.path).toBe('/api');
+  });
+
+  it('invalidInterval should create InvalidIntervalError', () => {
+    const error = invalidInterval('bad');
+    expect(error).toBeInstanceOf(InvalidIntervalError);
+    expect(error.interval).toBe('bad');
+  });
+
+  it('invalidArgument should create InvalidArgumentError', () => {
+    const error = invalidArgument('timeout', 'must be positive');
+    expect(error).toBeInstanceOf(InvalidArgumentError);
+    expect(error.argument).toBe('timeout');
+  });
+
+  it('pluginAlreadyRegistered should create PluginAlreadyRegisteredError', () => {
+    const error = pluginAlreadyRegistered('http');
+    expect(error).toBeInstanceOf(PluginAlreadyRegisteredError);
+    expect(error.pluginName).toBe('http');
+  });
+
+  it('connectionRefused should create ConnectionRefusedError', () => {
+    const error = connectionRefused('127.0.0.1', 8080);
+    expect(error).toBeInstanceOf(ConnectionRefusedError);
+    expect(error.host).toBe('127.0.0.1');
+    expect(error.port).toBe(8080);
+  });
+
+  it('networkError should create NetworkError', () => {
+    const error = networkError('DNS failed', { code: 'ENOTFOUND' });
+    expect(error).toBeInstanceOf(NetworkError);
+    expect(error.message).toBe('DNS failed');
+  });
+});
+
+describe('Type Guards', () => {
+  it('isHealthError should return true for HealthError', () => {
+    const error = new HealthError('test', ERROR_CODES.CHECK_FAILED);
+    expect(isHealthError(error)).toBe(true);
+    expect(isHealthError(new Error('test'))).toBe(false);
+    expect(isHealthError(null)).toBe(false);
+    expect(isHealthError('string')).toBe(false);
+  });
+
+  it('isCheckTimeoutError should return true for CheckTimeoutError', () => {
+    const error = new CheckTimeoutError('db', 1000);
+    expect(isCheckTimeoutError(error)).toBe(true);
+    expect(isCheckTimeoutError(new Error('test'))).toBe(false);
+  });
+
+  it('isCheckFailedError should return true for CheckFailedError', () => {
+    const error = new CheckFailedError('db', new Error('fail'));
+    expect(isCheckFailedError(error)).toBe(true);
+    expect(isCheckFailedError(new Error('test'))).toBe(false);
+  });
+
+  it('isServerError should return true for ServerError', () => {
+    const error = new ServerError('test');
+    expect(isServerError(error)).toBe(true);
+    expect(isServerError(new Error('test'))).toBe(false);
+  });
+
+  it('isNetworkError should return true for NetworkError', () => {
+    const error = new NetworkError('test');
+    expect(isNetworkError(error)).toBe(true);
+    expect(isNetworkError(new Error('test'))).toBe(false);
+  });
+});

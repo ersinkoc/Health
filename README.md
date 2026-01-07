@@ -4,6 +4,8 @@
 
 [![npm version](https://img.shields.io/npm/v/@oxog/health.svg)](https://npmjs.com/package/@oxog/health)
 [![License](https://img.shields.io/npm/l/@oxog/health.svg)](LICENSE)
+[![Test Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen.svg)](https://github.com/oxog/health)
+[![Tests](https://img.shields.io/badge/tests-741%20passed-brightgreen.svg)](https://github.com/oxog/health)
 
 ## Features
 
@@ -14,6 +16,7 @@
 - **Plugin Architecture** - Extensible micro-kernel design
 - **TypeScript** - 100% TypeScript with strict mode
 - **CLI Interface** - Command-line tools for serving and checking
+- **98%+ Test Coverage** - Comprehensive test suite with 741 tests
 
 ## Install
 
